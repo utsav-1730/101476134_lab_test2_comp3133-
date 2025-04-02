@@ -1,0 +1,47 @@
+<mat-toolbar color="primary" class="header-toolbar">
+  <span class="header-title">SpaceX Missions</span>
+</mat-toolbar>
+
+<div class="container">
+  <!-- Mission Filter Component -->
+  <app-missionfilter 
+    [launchYears]="launchYears" 
+    (yearSelected)="onYearSelected($event)">
+  </app-missionfilter>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading missions...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="error-message">
+    <mat-card color="warn">
+      <mat-card-content>{{ error }}</mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Mission List Grid -->
+  <mat-grid-list cols="4" rowHeight="1:1" gutterSize="20px" *ngIf="!isLoading && !error">
+    <mat-grid-tile *ngFor="let mission of filteredMissions">
+      <mat-card class="mission-card" (click)="viewDetails(mission.flight_number)">
+        <img mat-card-image [src]="mission.links.mission_patch_small || 'assets/placeholder.png'" alt="{{ mission.mission_name }} patch" class="mission-patch">
+        <mat-card-content>
+          <h3>{{ mission.mission_name }}</h3>
+          <p>Flight #{{ mission.flight_number }}</p>
+          <p>Year: {{ mission.launch_year }}</p>
+          <p class="mission-details">
+            {{ (mission.details || 'No details available') | truncate:100 }}
+          </p>
+        </mat-card-content>
+        <!-- Removed the Details button since the entire card is now clickable -->
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <!-- No Results Message -->
+   <div *ngIf="!isLoading && !error && filteredMissions.length === 0" class="no-results">
+      <p>No missions found for the selected year.</p>
+   </div>
+</div>
